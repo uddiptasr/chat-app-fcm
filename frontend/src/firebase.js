@@ -1,7 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging, onMessage } from "firebase/messaging";
 import toast from "react-hot-toast";
-// apiKey: "AIzaSyCBfloSeUe8i_FlXweenAmHiCUVH3q8aI8",
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_REACT_APP_API_KEY,
