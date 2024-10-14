@@ -3,7 +3,7 @@ import Message from '../models/message.model.js';
 import { getReceiverSocketId ,io} from '../socket/socket.js';
 import { sendNotification} from '../services/notificationService.js';
 import User from '../models/user.model.js';
-
+import redisClient from '../services/redisClient.js';
 
 export const sendMessage=async(req,res)=>{
     try {
@@ -32,11 +32,18 @@ export const sendMessage=async(req,res)=>{
 
         await Promise.all([conversation.save() ,newMessage.save()])
         
-        const receiverSocketId = getReceiverSocketId(receiverId);
-		if (receiverSocketId) {
-			// io.to(<socket_id>).emit() used to send events to specific client
-			io.to(receiverSocketId).emit("newMessage", newMessage);
-		}
+        // const receiverSocketId = getReceiverSocketId(receiverId);
+		// if (receiverSocketId) {
+		// 	// io.to(<socket_id>).emit() used to send events to specific client
+		// 	io.to(receiverSocketId).emit("newMessage", newMessage);
+		// }
+
+        const messagePayload = {
+            senderId,
+            receiverId,
+            message: newMessage,
+        };
+        redisClient.publish(receiverId, JSON.stringify(messagePayload)); // Use receiverId as the channel
 
         //find devicettoken
         let senderName=await User.findById(senderId).select("fullName");
